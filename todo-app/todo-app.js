@@ -23,12 +23,16 @@ const todos =
 ]
 
 const filters = {
-    searchText: ''
+    searchText: '',
+    hideCompleted: false
 }
 
 const renderTodos = (todos, filters) => {
     const filteredTodos = todos.filter((todo) => {
-        return todo.text.toLowerCase().includes(filters.searchText.toLowerCase());
+        const searchTextMatch = todo.text.toLowerCase().includes(filters.searchText.toLowerCase());
+        const hideCompletedMatch = !filters.hideCompleted || !todo.completed;
+        
+        return searchTextMatch && hideCompletedMatch;
     });
 
     const incompleteTodos = filteredTodos.filter((todo) => {
@@ -48,22 +52,7 @@ const renderTodos = (todos, filters) => {
     });
 };
 
-const hideCompleted = (todos) => {
-    const completedTodos = todos.filter((todo) => {
-        return todo.completed == false;
-    });
-    
-    document.querySelector('#todos').innerHTML = '';
-
-    completedTodos.forEach((todo) => {
-        const p = document.createElement('p');
-        p.textContent = todo.text;
-        document.querySelector('#todos').appendChild(p);
-    });
-}
-
 renderTodos(todos, filters);
-
 
 document.querySelector('#search-text').addEventListener('input', (e) => {
     filters.searchText = e.target.value;
@@ -87,8 +76,7 @@ document.querySelector('#new-todo').addEventListener('submit', (e) => {
 4. Setup renderTodos to remove completed items
 */
 
-document.querySelector('#checkbox').addEventListener('change', (e) => {
-    if(e.target.checked == true){
-        hideCompleted(todos);
-    }
+document.querySelector('#hide-completed').addEventListener('change', (e) => {
+    filters.hideCompleted = e.target.checked;
+    renderTodos(todos, filters);
 });
